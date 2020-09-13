@@ -1,6 +1,5 @@
-import sun.reflect.generics.tree.Tree;
+import dataStruc.ListNode;
 
-import java.awt.geom.FlatteningPathIterator;
 import java.io.IOException;
 import java.util.*;
 
@@ -89,11 +88,7 @@ public class Main {
     /**
      * T21 合并排序链表问题
      */
-    public static class ListNode {
-        int val;
-        ListNode next;
-        ListNode(int x) { val = x;}
-    }
+
     public static ListNode mergeTwoLists(ListNode l1, ListNode l2) {
         ListNode l3=null;
         if (l1==null)
@@ -649,7 +644,7 @@ public class Main {
         return s!=null&&(isIdentical(s,t)||traverse(s.left,t)||traverse(s.right,t));
     }
 
-    class Solution {
+    static class Solution {
 //        public double findMedianSortedArrays(int[] nums1, int[] nums2) {
 //
 //        }
@@ -662,12 +657,84 @@ public class Main {
             return res;
         }
     }
+    static class CustomStack {
+        int[] stack=new int[0];
+        int length;
+        public CustomStack(int maxSize) {
+            stack=new int[maxSize];
+            length=0;
+        }
 
+        public void push(int x) {
+            if(length<stack.length)
+                stack[length++]=x;
+        }
+
+        public int pop() {
+            return length>0?stack[(length--)-1]:-1;
+        }
+
+        public void increment(int k, int val) {
+            for(int i=0;i<Math.min(k,length);i++)
+                stack[i]+=val;
+        }
+    }
     public static void main(String[] args) throws IOException {
-        TreeNode tn1=new TreeNode(2);
-        TreeNode tn2=new TreeNode(1);
-        tn1.right=new TreeNode(1);
-        if (isSubtree(tn1,tn2))
-            System.out.println("yes");
+        int[][] a=new int[][]{{4,7},{1,2}};
+        int[][] b=new int[][]{{2,5},{6,7}};
+        int[][] ma=mergeSeg(a);
+        int[][] mb=mergeSeg(b);
+        System.out.println(coverSeg(ma,mb));
+    }
+
+    /*
+    线段数组覆盖问题
+     */
+    public void segmentCover(){
+        int[][] a=new int[][]{{2,6},{1,3}};
+        int[][] b=new int[][]{{1,4},{4,5}};
+        int[][] ma=mergeSeg(a);
+        int[][] mb=mergeSeg(b);
+        System.out.println(coverSeg(ma,mb));
+    }
+
+    private static boolean coverSeg(int[][] ma, int[][] mb) {
+        for (int[] b:mb){
+            boolean cover=false;
+            for (int[] a:ma){
+                if (a[0]<=b[0]&&a[1]>=b[1])
+                    cover=true;
+            }
+            if (!cover)
+                return false;
+        }
+        return true;
+    }
+
+    private static int[][] mergeSeg(int[][] a) {
+        if (a.length==0) return a;
+        List<int[]> ans=new ArrayList<>();
+        Arrays.sort(a, new Comparator<int[]>() {
+            @Override
+            public int compare(int[] o1, int[] o2) {
+                if (o1[0]==o2[0])
+                    return o1[1]-o2[1];
+                return o1[0]-o2[0];
+            }
+        });
+        int start=a[0][0],end=a[0][1];
+        for (int i=1;i<a.length;i++){
+            if (start==0&&end==0){
+                start=a[i][0];
+                end=a[i][1];
+            }else if(a[i][0]>end){//不相交
+                ans.add(new int[]{start,end});
+                start=0;
+                end=0;
+            }else {
+                end=a[i][1];
+            }
+        }
+        return (int[][]) ans.toArray(new int[ans.size()][]);
     }
 }
